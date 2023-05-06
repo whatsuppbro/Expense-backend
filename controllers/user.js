@@ -13,6 +13,7 @@ const login = async (req, res) => {
     try {
         const {email,password} = req.body
         const user = await userModel.findOne({email})
+        console.log('User:', user); // Add this line
         console.log(email,password)
         if(!user){
             return res.status(404).json({message: 'User Not Found'})
@@ -22,6 +23,7 @@ const login = async (req, res) => {
         const token = jwt.sign({ id: user._id }, secretKey, { expiresIn: '1h' });
         
         const isPasswordValid = await bcrypt.compare(password, user.password);
+        console.log('isPasswordValid:', isPasswordValid); // Add this line
         if (!isPasswordValid) {
           return res.status(400).json({ message: 'Invalid Password' });
         }
@@ -29,7 +31,7 @@ const login = async (req, res) => {
         res.status(200).json({
             success:true,
             user,
-            token, // Add the token to the response
+            token,
             message: 'Login Success'
         })
 

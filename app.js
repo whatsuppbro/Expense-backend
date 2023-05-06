@@ -8,7 +8,13 @@ require('dotenv').config()
 
 //middlewares
 app.use(express.json())
-app.use(cors())
+const corsOptions = {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  };
+  
+app.use(cors(corsOptions));
 
 //routes
 readdirSync('./routes').map((route) => app.use('/api/v1', require('./routes/' + route)))
