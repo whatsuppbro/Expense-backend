@@ -6,7 +6,6 @@ const app = express()
 
 require('dotenv').config()
 
-//middlewares
 app.use(express.json())
 const corsOptions = {
     origin: '*',
@@ -16,7 +15,6 @@ const corsOptions = {
   
 app.use(cors(corsOptions));
 
-//routes
 readdirSync('./routes').map((route) => app.use('/api/v1', require('./routes/' + route)))
 
 const server = () => {

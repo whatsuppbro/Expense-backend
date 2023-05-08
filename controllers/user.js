@@ -19,7 +19,6 @@ const login = async (req, res) => {
       return res.status(404).json({ message: "User Not Found" });
     }
 
-    // Create and sign the JWT token
     const token = jwt.sign({ id: user._id }, secretKey, { expiresIn: "1h" });
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -80,12 +79,10 @@ const updatePassword = async (req, res) => {
       return res.status(404).json({ message: "User Not Found" });
     }
 
-    // Hash the new password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
     console.log('New hashed password:', hashedPassword);
 
-    // Update the user's password in the database
     user.password = hashedPassword;
     console.log('User before save:', user);
     await user.save();
