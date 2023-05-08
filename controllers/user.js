@@ -11,79 +11,84 @@ app.use(express.json());
 
 const login = async (req, res) => {
   try {
-      const { email, password } = req.body;
-      const user = await userModel.findOne({ email });
-
-      if (!user) {
-          return res.status(404).json({ message: 'User Not Found' });
+      const {email,password} = req.body
+      const user = await userModel.findOne({email})
+      if(!user){
+          return res.status(404).json({message: 'User Not Found'})
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-          return res.status(400).json({ message: 'Invalid Password' });
+        return res.status(400).json({ message: 'Invalid Password' });
       }
-
+      
+      // Create and sign the JWT token
       const token = jwt.sign({ id: user._id }, secretKey, { expiresIn: '1h' });
 
       res.status(200).json({
-          success: true,
+          success:true,
           user,
           token,
           message: 'Login Success'
-      });
+      })
+
   } catch (error) {
       res.status(400).json({
-          success: false,
+          success:false,
           error,
           message: 'Login Failed',
-      });
+      })
   }
-}
+};
 
 const register = async (req, res) => {
   try {
-      const newUser = new userModel(req.body);
-      await newUser.save();
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    const newUser = new userModel({...req.body, password: hashedPassword});
+    await newUser.save();
 
-      res.status(201).json({
-          success: true,
-          newUser,
-          message: "Register Success",
-      });
+    res.status(201).json({
+      success: true,
+      newUser,
+      message: "Register Success",
+    });
   } catch (error) {
-      if (error.code === 11000) {
-          res.status(400).json({
-              success: false,
-              error,
-              message: "Email already in use",
-          });
-      } else {
-          res.status(400).json({
-              success: false,
-              error,
-              message: "Register Failed",
-          });
-      }
+    console.error('Error during registration:', error);
+    if (error.code === 11000) {
+      res.status(400).json({
+        success: false,
+        error,
+        message: "Email already in use",
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        error,
+        message: "Register Failed",
+      });
+    }
   }
 };
 
 const updatePassword = async (req, res) => {
   try {
-      const { email, newPassword } = req.body;
-      const user = await userModel.findOne({ email });
+    const { email, newPassword } = req.body;
+    const user = await userModel.findOne({ email });
 
-      if (!user) {
-          return res.status(404).json({ message: "User Not Found" });
-      }
+    if (!user) {
+      return res.status(404).json({ message: "User Not Found" });
+    }
 
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-      user.password = hashedPassword;
-      await user.save();
+    user.password = hashedPassword;
+    await user.save();
 
-      res.status(200).json({ message: "Password Updated Successfully" });
+    res.status(200).json({ message: "Password Updated Successfully" });
   } catch (error) {
-      res.status(400).json({ message: "Update Failed", error });
+    res.status(400).json({ message: "Update Failed", error });
   }
 };
 
