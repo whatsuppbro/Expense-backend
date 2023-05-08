@@ -11,33 +11,35 @@ app.use(express.json());
 
 const login = async (req, res) => {
   try {
-      const {email,password} = req.body
-      const user = await userModel.findOne({email})
-      if(!user){
-          return res.status(404).json({message: 'User Not Found'})
-      }
+    const { email, password } = req.body;
+    const user = await userModel.findOne({ email });
+    console.log("User:", user);
+    console.log(email, password);
+    if (!user) {
+      return res.status(404).json({ message: "User Not Found" });
+    }
 
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return res.status(400).json({ message: 'Invalid Password' });
-      }
-      
-      // Create and sign the JWT token
-      const token = jwt.sign({ id: user._id }, secretKey, { expiresIn: '1h' });
+    // Create and sign the JWT token
+    const token = jwt.sign({ id: user._id }, secretKey, { expiresIn: "1h" });
 
-      res.status(200).json({
-          success:true,
-          user,
-          token,
-          message: 'Login Success'
-      })
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log("isPasswordValid:", isPasswordValid);
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: "Invalid Password" });
+    }
 
+    res.status(200).json({
+      success: true,
+      user,
+      token,
+      message: "Login Success",
+    });
   } catch (error) {
-      res.status(400).json({
-          success:false,
-          error,
-          message: 'Login Failed',
-      })
+    res.status(400).json({
+      success: false,
+      error,
+      message: "Login Failed",
+    });
   }
 };
 
