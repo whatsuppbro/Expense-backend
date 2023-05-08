@@ -80,9 +80,6 @@ const updatePassword = async (req, res) => {
   try {
     const { email, newPassword } = req.body;
     const user = await userModel.findOne({ email });
-    const isPasswordValid = await bcrypt.compare(newPassword, hashedPassword);
-    console.log("isPasswordValid (updatePassword):", isPasswordValid);
-
 
     if (!user) {
       return res.status(404).json({ message: "User Not Found" });
@@ -103,6 +100,7 @@ const updatePassword = async (req, res) => {
     res.status(400).json({ message: "Update Failed", error });
   }
 };
+
 
 
 const authenticate = async (req, res, next) => {
