@@ -1,6 +1,6 @@
 const { addExpense, getExpense, deleteExpense } = require('../controllers/expense');
 const { addIncome, getIncomes, deleteIncome } = require('../controllers/income');
-const {login, register, authenticate} = require('../controllers/user')
+const {login, register, authenticate, updatePassword} = require('../controllers/user')
 
 const router = require('express').Router();
 
@@ -12,5 +12,6 @@ router.post('/add-income',authenticate , addIncome)
       .delete('/delete-expense/:id',authenticate, deleteExpense)
       .post('/login', login)
       .post('/register', register)
+      .put('/reset-password',authenticate , updatePassword)
 
 module.exports = router

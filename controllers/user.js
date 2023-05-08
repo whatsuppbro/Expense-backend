@@ -13,7 +13,7 @@ const login = async (req, res) => {
     try {
         const {email,password} = req.body
         const user = await userModel.findOne({email})
-        console.log('User:', user); // Add this line
+        console.log('User:', user);
         console.log(email,password)
         if(!user){
             return res.status(404).json({message: 'User Not Found'})
@@ -23,7 +23,7 @@ const login = async (req, res) => {
         const token = jwt.sign({ id: user._id }, secretKey, { expiresIn: '1h' });
         
         const isPasswordValid = await bcrypt.compare(password, user.password);
-        console.log('isPasswordValid:', isPasswordValid); // Add this line
+        console.log('isPasswordValid:', isPasswordValid);
         if (!isPasswordValid) {
           return res.status(400).json({ message: 'Invalid Password' });
         }
@@ -71,6 +71,29 @@ const register = async (req, res) => {
       }
     }
   };
+
+  const updatePassword = async (req, res) => {
+    try {
+      const { email, newPassword } = req.body;
+      const user = await userModel.findOne({ email });
+  
+      if (!user) {
+        return res.status(404).json({ message: "User Not Found" });
+      }
+  
+      // Hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+  
+      // Update the user's password in the database
+      user.password = hashedPassword;
+      await user.save();
+  
+      res.status(200).json({ message: "Password Updated Successfully" });
+    } catch (error) {
+      res.status(400).json({ message: "Update Failed", error });
+    }
+  };
+  
   
 
   const authenticate = async (req, res, next) => {
@@ -98,4 +121,4 @@ const register = async (req, res) => {
     }
 };
 
-module.exports = {login, register, authenticate};
+module.exports = {login, register, authenticate, updatePassword};
