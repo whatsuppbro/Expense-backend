@@ -47,6 +47,9 @@ const register = async (req, res) => {
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    const isPasswordValid = await bcrypt.compare(req.body.password, hashedPassword);
+    console.log("isPasswordValid (register):", isPasswordValid);
+
     const newUser = new userModel({...req.body, password: hashedPassword});
     await newUser.save();
 
@@ -77,6 +80,9 @@ const updatePassword = async (req, res) => {
   try {
     const { email, newPassword } = req.body;
     const user = await userModel.findOne({ email });
+    const isPasswordValid = await bcrypt.compare(newPassword, hashedPassword);
+    console.log("isPasswordValid (updatePassword):", isPasswordValid);
+
 
     if (!user) {
       return res.status(404).json({ message: "User Not Found" });
