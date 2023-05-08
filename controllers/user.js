@@ -82,11 +82,14 @@ const updatePassword = async (req, res) => {
       return res.status(404).json({ message: "User Not Found" });
     }
 
+    // Hash the new password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
     console.log('New hashed password:', hashedPassword);
 
+    // Update the user's password in the database
     user.password = hashedPassword;
+    console.log('User before save:', user);
     await user.save();
 
     res.status(200).json({ message: "Password Updated Successfully" });
@@ -94,6 +97,7 @@ const updatePassword = async (req, res) => {
     res.status(400).json({ message: "Update Failed", error });
   }
 };
+
 
 const authenticate = async (req, res, next) => {
   try {
