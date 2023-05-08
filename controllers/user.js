@@ -93,8 +93,6 @@ const register = async (req, res) => {
       res.status(400).json({ message: "Update Failed", error });
     }
   };
-  
-  
 
   const authenticate = async (req, res, next) => {
     try {
