@@ -47,6 +47,8 @@ const register = async (req, res) => {
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    console.log("Original password:", req.body.password);
+    console.log("Hashed password (register):", hashedPassword);
     const isPasswordValid = await bcrypt.compare(req.body.password, hashedPassword);
     console.log("isPasswordValid (register):", isPasswordValid);
 
